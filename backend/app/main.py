@@ -2,7 +2,15 @@ import sys
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+# Ensure backend directory is in python path so 'from app.routers ...' resolves cleanly
+backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
 from app.routers import auth, fields, marketplace, fires, outcomes
+
+
 
 app = FastAPI(
     title="CropChar API",

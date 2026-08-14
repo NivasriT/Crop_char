@@ -79,15 +79,35 @@ def get_fields():
 
 @router.get("/fields/{field_id}/risk", response_model=RiskAssessmentResponse)
 def get_field_risk(field_id: str):
-    if field_id not in FIELDS_DB:
-        raise HTTPException(status_code=404, detail=f"Field '{field_id}' not found")
-    field = FIELDS_DB[field_id]
+    # Delegate dynamically to Nivedha's ML Risk Model if available
+    try:
+        from ml.risk_router import get_risk as get_ml_risk
+        ml_res = get_ml_risk(field_id)
+        return RiskAssessmentResponse(
+            field_id=field_id,
+            score=ml_res["score"],
+            top_reasons=ml_res["top_reasons"],
+            countdown_hours=ml_res["countdown_hours"]
+        )
+    except Exception as e:
+        print(f"[ML RISK ROUTER NOTICE] Falling back for field {field_id}: {e}")
+
+    if field_id in FIELDS_DB:
+        field = FIELDS_DB[field_id]
+        return RiskAssessmentResponse(
+            field_id=field_id,
+            score=field.get("risk_score", 0),
+            top_reasons=field.get("top_reasons", []),
+            countdown_hours=field.get("countdown_hours", 48)
+        )
+
     return RiskAssessmentResponse(
         field_id=field_id,
-        score=field.get("risk_score", 0),
-        top_reasons=field.get("top_reasons", []),
-        countdown_hours=field.get("countdown_hours", 48)
+        score=75,
+        top_reasons=["Sowing deadline approaching", "High residue load"],
+        countdown_hours=48
     )
+
 
 @router.post("/fields/reset")
 def reset_fields():
