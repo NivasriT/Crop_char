@@ -5,3 +5,7 @@ def nearest_companies(field_lat, field_lon, companies_csv="gis-data/mock_compani
     df = pd.read_csv(companies_csv)
     df["distance_km"] = df.apply(lambda r: geodesic((field_lat, field_lon), (r.lat, r.lon)).km, axis=1)
     return df.sort_values("distance_km").head(top_n).to_dict(orient="records")
+    def nearest_chc(field_lat, field_lon, chc_csv="gis-data/mock_chc.csv"):
+    df = pd.read_csv(chc_csv)
+    df["distance_km"] = df.apply(lambda r: geodesic((field_lat, field_lon), (r.lat, r.lon)).km, axis=1)
+    return df.sort_values("distance_km").iloc[0].to_dict()
