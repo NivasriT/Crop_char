@@ -1,1 +1,364 @@
-{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"field_id":"F0000"},"geometry":{"type":"Polygon","coordinates":[[[75.794808,30.909468],[75.794752,30.908685],[75.798789,30.908661],[75.798983,30.909563],[75.794808,30.909468]]]}},{"type":"Feature","properties":{"field_id":"F0001"},"geometry":{"type":"Polygon","coordinates":[[[75.795838,30.908678],[75.79585,30.907402],[75.796866,30.907362],[75.796866,30.908672],[75.795838,30.908678]]]}},{"type":"Feature","properties":{"field_id":"F0002"},"geometry":{"type":"Polygon","coordinates":[[[75.796854,30.908672],[75.796866,30.907362],[75.796866,30.907372],[75.797693,30.907321],[75.797941,30.908666],[75.796854,30.908672]]]}},{"type":"Feature","properties":{"field_id":"F0003"},"geometry":{"type":"Polygon","coordinates":[[[75.797926,30.908586],[75.797697,30.907344],[75.798366,30.907169],[75.798686,30.908662],[75.797926,30.908586]]]}},{"type":"Feature","properties":{"field_id":"F0004"},"geometry":{"type":"Polygon","coordinates":[[[75.794752,30.908685],[75.794775,30.90801],[75.795844,30.908019],[75.795838,30.908678],[75.795838,30.908678],[75.794752,30.908685]]]}},{"type":"Feature","properties":{"field_id":"F0005"},"geometry":{"type":"Polygon","coordinates":[[[75.798679,30.908628],[75.798307,30.906926],[75.798945,30.906865],[75.799725,30.90871],[75.798679,30.908628]]]}},{"type":"Feature","properties":{"field_id":"F0006"},"geometry":{"type":"Polygon","coordinates":[[[75.79585,30.907402],[75.795838,30.908],[75.794775,30.90801],[75.794763,30.907433],[75.79585,30.907402]]]}},{"type":"Feature","properties":{"field_id":"F0007"},"geometry":{"type":"Polygon","coordinates":[[[75.79826,30.906967],[75.798083,30.906409],[75.798378,30.906054],[75.799937,30.906227],[75.799902,30.906804],[75.798933,30.906865],[75.798933,30.906855],[75.79826,30.906967]]]}},{"type":"Feature","properties":{"field_id":"F0008"},"geometry":{"type":"Polygon","coordinates":[[[75.794732,30.906419],[75.796857,30.90632],[75.796841,30.907093],[75.79474,30.907079],[75.794732,30.906419]]]}},{"type":"Feature","properties":{"field_id":"F0010"},"geometry":{"type":"Polygon","coordinates":[[[75.796882,30.90698],[75.796841,30.906341],[75.798048,30.906313],[75.79818,30.906788],[75.796882,30.90698]]]}}]}
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0001",
+        "field_id": "F0001",
+        "name": "Patiala North Sector A",
+        "farmer_id": "farmer_9876",
+        "farmer_name": "Gurpreet Singh",
+        "crop_type": "Paddy",
+        "area_acres": 5.5,
+        "planting_month": "June",
+        "harvest_month": "October",
+        "state": "Punjab",
+        "district": "Patiala",
+        "village": "Nabaha",
+        "risk_score": 93,
+        "top_reasons": [
+          "Sowing deadline approaching",
+          "History of burning on this field",
+          "High residue load"
+        ],
+        "countdown_hours": 192,
+        "status": "monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [76.3800, 30.3400],
+            [76.3850, 30.3400],
+            [76.3850, 30.3440],
+            [76.3800, 30.3440],
+            [76.3800, 30.3400]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0002",
+        "field_id": "F0002",
+        "name": "Patiala East Sector B",
+        "farmer_id": "farmer_9877",
+        "farmer_name": "Harjit Kaur",
+        "crop_type": "Paddy",
+        "area_acres": 7.4,
+        "planting_month": "June",
+        "harvest_month": "October",
+        "state": "Punjab",
+        "district": "Patiala",
+        "village": "Samana",
+        "risk_score": 87,
+        "top_reasons": [
+          "Sowing deadline approaching",
+          "High residue load"
+        ],
+        "countdown_hours": 96,
+        "status": "monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [76.3900, 30.3500],
+            [76.3960, 30.3500],
+            [76.3960, 30.3550],
+            [76.3900, 30.3550],
+            [76.3900, 30.3500]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0024",
+        "field_id": "F0024",
+        "name": "Patiala South Field 24",
+        "farmer_id": "farmer_9878",
+        "farmer_name": "Jaswinder Pal",
+        "crop_type": "Paddy",
+        "area_acres": 6.2,
+        "planting_month": "June",
+        "harvest_month": "October",
+        "state": "Punjab",
+        "district": "Patiala",
+        "village": "Rajpura",
+        "risk_score": 94,
+        "top_reasons": [
+          "History of burning on this field",
+          "Far from nearest CHC machine"
+        ],
+        "countdown_hours": 48,
+        "status": "fire_detected"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [76.3700, 30.3300],
+            [76.3750, 30.3300],
+            [76.3750, 30.3340],
+            [76.3700, 30.3340],
+            [76.3700, 30.3300]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0012",
+        "field_id": "F0012",
+        "name": "Patiala West Farm",
+        "farmer_id": "farmer_9879",
+        "farmer_name": "Manpreet Dhillon",
+        "crop_type": "Paddy",
+        "area_acres": 5.2,
+        "planting_month": "May",
+        "harvest_month": "September",
+        "state": "Punjab",
+        "district": "Patiala",
+        "village": "Ghanaur",
+        "risk_score": 35,
+        "top_reasons": [
+          "Baseline seasonal risk"
+        ],
+        "countdown_hours": 320,
+        "status": "monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [76.3600, 30.3200],
+            [76.3650, 30.3200],
+            [76.3650, 30.3240],
+            [76.3600, 30.3240],
+            [76.3600, 30.3200]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0003",
+        "field_id": "F0003",
+        "name": "Ludhiana Central Plot",
+        "farmer_id": "farmer_8801",
+        "farmer_name": "Sukhdev Singh",
+        "crop_type": "Paddy",
+        "area_acres": 8.0,
+        "planting_month": "June",
+        "harvest_month": "October",
+        "state": "Punjab",
+        "district": "Ludhiana",
+        "village": "Jagraon",
+        "risk_score": 91,
+        "top_reasons": [
+          "Sowing deadline approaching",
+          "High residue load"
+        ],
+        "countdown_hours": 120,
+        "status": "monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [75.8500, 30.9000],
+            [75.8560, 30.9000],
+            [75.8560, 30.9050],
+            [75.8500, 30.9050],
+            [75.8500, 30.9000]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0004",
+        "field_id": "F0004",
+        "name": "Ludhiana South Sector C",
+        "farmer_id": "farmer_8802",
+        "farmer_name": "Balwinder Kumar",
+        "crop_type": "Paddy",
+        "area_acres": 4.5,
+        "planting_month": "June",
+        "harvest_month": "October",
+        "state": "Punjab",
+        "district": "Ludhiana",
+        "village": "Khanna",
+        "risk_score": 82,
+        "top_reasons": [
+          "Far from nearest CHC machine"
+        ],
+        "countdown_hours": 144,
+        "status": "monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [75.8600, 30.8900],
+            [75.8650, 30.8900],
+            [75.8650, 30.8940],
+            [75.8600, 30.8940],
+            [75.8600, 30.8900]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0010",
+        "field_id": "F0010",
+        "name": "Karnal Highway Farm",
+        "farmer_id": "farmer_7701",
+        "farmer_name": "Rajesh Verma",
+        "crop_type": "Paddy",
+        "area_acres": 6.8,
+        "planting_month": "June",
+        "harvest_month": "October",
+        "state": "Haryana",
+        "district": "Karnal",
+        "village": "Gharaunda",
+        "risk_score": 88,
+        "top_reasons": [
+          "Sowing deadline approaching",
+          "History of burning on this field"
+        ],
+        "countdown_hours": 110,
+        "status": "monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [76.9900, 29.6800],
+            [76.9950, 29.6800],
+            [76.9950, 29.6840],
+            [76.9900, 29.6840],
+            [76.9900, 29.6800]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0011",
+        "field_id": "F0011",
+        "name": "Karnal Rice Belt",
+        "farmer_id": "farmer_7702",
+        "farmer_name": "Anil Chaudhary",
+        "crop_type": "Paddy",
+        "area_acres": 9.2,
+        "planting_month": "June",
+        "harvest_month": "October",
+        "state": "Haryana",
+        "district": "Karnal",
+        "village": "Indri",
+        "risk_score": 95,
+        "top_reasons": [
+          "History of burning on this field",
+          "High residue load"
+        ],
+        "countdown_hours": 36,
+        "status": "fire_detected"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [77.0000, 29.6900],
+            [77.0060, 29.6900],
+            [77.0060, 29.6950],
+            [77.0000, 29.6950],
+            [77.0000, 29.6900]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0030",
+        "field_id": "F0030",
+        "name": "Rohtas Canal Basin",
+        "farmer_id": "farmer_6601",
+        "farmer_name": "Manoj Kumar Singh",
+        "crop_type": "Paddy",
+        "area_acres": 4.2,
+        "planting_month": "July",
+        "harvest_month": "November",
+        "state": "Bihar",
+        "district": "Rohtas",
+        "village": "Sasaram",
+        "risk_score": 86,
+        "top_reasons": [
+          "High residue load",
+          "Far from nearest CHC machine"
+        ],
+        "countdown_hours": 160,
+        "status": "monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [84.0100, 24.9500],
+            [84.0160, 24.9500],
+            [84.0160, 24.9550],
+            [84.0100, 24.9550],
+            [84.0100, 24.9500]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "F0040",
+        "field_id": "F0040",
+        "name": "Mathura Yamuna Belt",
+        "farmer_id": "farmer_5501",
+        "farmer_name": "Ram Ratan Sharma",
+        "crop_type": "Paddy",
+        "area_acres": 7.0,
+        "planting_month": "June",
+        "harvest_month": "October",
+        "state": "Uttar Pradesh",
+        "district": "Mathura",
+        "village": "Chhata",
+        "risk_score": 89,
+        "top_reasons": [
+          "Sowing deadline approaching",
+          "History of burning on this field"
+        ],
+        "countdown_hours": 80,
+        "status": "monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [77.6700, 27.4900],
+            [77.6750, 27.4900],
+            [77.6750, 27.4940],
+            [77.6700, 27.4940],
+            [77.6700, 27.4900]
+          ]
+        ]
+      }
+    }
+  ]
+}

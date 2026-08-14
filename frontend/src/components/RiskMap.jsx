@@ -1,72 +1,255 @@
-import React from "react";
-import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from "react-leaflet";
+import React, { useState } from "react";
+import { MapContainer, TileLayer, Polygon, Marker, Popup, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
-// Fix Leaflet marker icons in React
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+// Custom Leaflet Markers (Clean Professional Circles, No Emojis)
+const greenIcon = L.divIcon({
+  className: "custom-leaflet-marker",
+  html: `<div style="background-color: #059669; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 6px rgba(5,150,105,0.5);"></div>`,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7]
 });
 
-export default function RiskMap({ fields, fires, onSelectField }) {
-  // Center around Coimbatore region (11.016, 76.955 from Navithanjali's output)
-  const defaultCenter = [31.1471, 75.3412];
+const orangeIcon = L.divIcon({
+  className: "custom-leaflet-marker",
+  html: `<div style="background-color: #d97706; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 8px rgba(217,119,6,0.6);"></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8]
+});
 
-  const getFieldStyle = (field) => {
-    const score = field.risk_score || 0;
-    let color = "#4caf50"; // Low Risk
-    if (score > 70) color = "#f44336"; // High Risk
-    else if (score > 40) color = "#ff9800"; // Medium Risk
+const redIcon = L.divIcon({
+  className: "custom-leaflet-marker",
+  html: `<div style="background-color: #dc2626; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 12px rgba(220,38,38,0.8); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;">!</div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10]
+});
 
-    return {
-      fillColor: color,
-      weight: 2,
-      opacity: 1,
-      color: "#ffffff",
-      fillOpacity: 0.6,
-    };
+function LocationPickerEvents({ onPickLocation }) {
+  useMapEvents({
+    click(e) {
+      if (onPickLocation) {
+        onPickLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
+      }
+    },
+  });
+  return null;
+}
+
+export default function RiskMap({ fields = [], fires = [], onSelectField, pickMode = false, onPickLocation, selectedLocation }) {
+  const [mapTileType, setMapTileType] = useState("carto"); // "carto" or "satellite"
+
+  const defaultCenter = [30.34, 76.38];
+
+  const getFieldColor = (field) => {
+    if (field.status === "fire_detected" || field.status === "ground_team_dispatched" || field.status === "under_verification") {
+      return { color: "#dc2626", fillColor: "#dc2626", fillOpacity: 0.45 };
+    }
+    if (field.risk_score >= 70 || field.status === "offered") {
+      return { color: "#d97706", fillColor: "#d97706", fillOpacity: 0.35 };
+    }
+    return { color: "#059669", fillColor: "#059669", fillOpacity: 0.25 };
   };
 
   return (
-    <div style={{ height: "400px", width: "100%", borderRadius: "8px", overflow: "hidden" }}>
-      <MapContainer center={defaultCenter} zoom={13} style={{ height: "100%", width: "100%" }}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        {/* Render polygons directly from Navithanjali's real field data */}
-        {fields && fields.map((field) => field.geometry && (
-          <GeoJSON
-            key={field.id}
-            data={field.geometry}
-            style={() => getFieldStyle(field)}
-            eventHandlers={{
-              click: () => onSelectField && onSelectField(field),
-            }}
+    <div style={styles.mapWrapper}>
+      {/* Map Control Bar */}
+      <div style={styles.mapHeader}>
+        <div style={styles.legendGroup}>
+          <span style={styles.legendItem}><span style={{ ...styles.dot, background: "#059669" }}></span> Monitored Field</span>
+          <span style={styles.legendItem}><span style={{ ...styles.dot, background: "#d97706" }}></span> High Burning Risk</span>
+          <span style={styles.legendItem}><span style={{ ...styles.dot, background: "#dc2626" }}></span> Active Satellite Fire</span>
+        </div>
+        <div style={styles.tileToggle}>
+          <button 
+            style={{ ...styles.tileBtn, background: mapTileType === "carto" ? "#ffffff" : "transparent", color: mapTileType === "carto" ? "#0f172a" : "#64748b" }}
+            onClick={() => setMapTileType("carto")}
           >
-            <Popup>
-              <strong>{field.id}: {field.name}</strong><br />
-              Farmer: {field.farmer_name}<br />
-              Risk Score: <strong>{field.risk_score}%</strong>
-            </Popup>
-          </GeoJSON>
-        ))}
+            Light Map
+          </button>
+          <button 
+            style={{ ...styles.tileBtn, background: mapTileType === "satellite" ? "#ffffff" : "transparent", color: mapTileType === "satellite" ? "#0f172a" : "#64748b" }}
+            onClick={() => setMapTileType("satellite")}
+          >
+            Satellite View
+          </button>
+        </div>
+      </div>
 
-        {/* Render live NASA FIRMS active fires from /api/fires */}
-        {fires && fires.map((fire, idx) => (
-          <Marker key={idx} position={[fire.lat, fire.lon]}>
+      <MapContainer 
+        center={defaultCenter} 
+        zoom={10} 
+        style={styles.mapContainer}
+        scrollWheelZoom={true}
+      >
+        {mapTileType === "carto" ? (
+          <TileLayer
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          />
+        ) : (
+          <TileLayer
+            attribution="Esri World Imagery"
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          />
+        )}
+
+        {pickMode && <LocationPickerEvents onPickLocation={onPickLocation} />}
+
+        {pickMode && selectedLocation && (
+          <Marker position={[selectedLocation.lat, selectedLocation.lng]} icon={greenIcon}>
             <Popup>
-              <strong>🔥 NASA FIRMS Fire Detected!</strong><br />
-              Field: {fire.field_id}<br />
-              Confidence: {(fire.confidence * 100).toFixed(0)}%<br />
-              Brightness: {fire.brightness_kelvin} K
+              <div style={styles.popupContent}>
+                <strong>Selected Field Location</strong><br />
+                Latitude: {selectedLocation.lat.toFixed(4)}, Longitude: {selectedLocation.lng.toFixed(4)}
+              </div>
             </Popup>
           </Marker>
-        ))}
+        )}
+
+        {!pickMode && fields.map((field) => {
+          const coords = field.geometry?.coordinates?.[0]?.map(pt => [pt[1], pt[0]]) || [[30.34, 76.38], [30.344, 76.38], [30.344, 76.385], [30.34, 76.385]];
+          const centerPt = coords[0];
+          const style = getFieldColor(field);
+          const isFire = field.status === "fire_detected" || field.status === "ground_team_dispatched" || field.status === "under_verification";
+          const isOrange = field.risk_score >= 70 && !isFire;
+          const isGreen = !isFire && !isOrange;
+
+          return (
+            <React.Fragment key={field.id}>
+              <Polygon 
+                positions={coords} 
+                pathOptions={style}
+                eventHandlers={{
+                  click: () => onSelectField && onSelectField(field)
+                }}
+              />
+              <Marker 
+                position={centerPt} 
+                icon={isFire ? redIcon : isOrange ? orangeIcon : greenIcon}
+                eventHandlers={{
+                  click: () => onSelectField && onSelectField(field)
+                }}
+              >
+                <Popup>
+                  <div className="custom-map-popup">
+                    {/* GREEN MONITORED FIELD */}
+                    {isGreen && (
+                      <div>
+                        <div className="popup-title">FIELD {field.id}</div>
+                        <div><strong>Farmer:</strong> {field.farmer_name}</div>
+                        <div><strong>Crop:</strong> {field.crop_type}</div>
+                        <div><strong>Area:</strong> {field.area_acres} acres</div>
+                        <div><strong>District:</strong> {field.district}</div>
+                        <div style={{ marginTop: "4px" }}>
+                          Status: <span className="popup-badge badge-green">No Active Fire</span>
+                        </div>
+                        <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "4px" }}>Last monitored: 10:42 AM</div>
+                        <button className="popup-btn" onClick={() => onSelectField && onSelectField(field)}>Inspect Field</button>
+                      </div>
+                    )}
+
+                    {/* ORANGE HIGH RISK FIELD */}
+                    {isOrange && (
+                      <div>
+                        <div className="popup-title">FIELD {field.id}</div>
+                        <div><strong>Crop:</strong> {field.crop_type}</div>
+                        <div><strong>Area:</strong> {field.area_acres} acres</div>
+                        <div><strong>District:</strong> {field.district}</div>
+                        <div><strong>Risk Score:</strong> <span style={{ color: "#d97706", fontWeight: "bold" }}>{field.risk_score}</span></div>
+                        <div><strong>Predicted Risk:</strong> <span className="popup-badge badge-orange">HIGH RISK</span></div>
+                        <div><strong>Prevention Window:</strong> {field.countdown_hours || 192} hours</div>
+                        <div><strong>Biomass Opportunity:</strong> Active</div>
+                        <button className="popup-btn" style={{ background: "#d97706" }} onClick={() => onSelectField && onSelectField(field)}>Inspect Field</button>
+                      </div>
+                    )}
+
+                    {/* RED ACTIVE FIRE */}
+                    {isFire && (
+                      <div>
+                        <div className="popup-title" style={{ color: "#dc2626" }}>ACTIVE SATELLITE FIRE</div>
+                        <div><strong>Field ID:</strong> {field.id}</div>
+                        <div><strong>Farmer:</strong> {field.farmer_name}</div>
+                        <div><strong>Crop:</strong> {field.crop_type}</div>
+                        <div><strong>Area:</strong> {field.area_acres} acres</div>
+                        <div><strong>District:</strong> {field.district}</div>
+                        <div><strong>Detected:</strong> 10:24 AM</div>
+                        <div><strong>Satellite Confidence:</strong> 94%</div>
+                        <div style={{ marginTop: "4px" }}>
+                          Status: <span className="popup-badge badge-red">Awaiting Verification</span>
+                        </div>
+                        <button className="popup-btn" style={{ background: "#dc2626" }} onClick={() => onSelectField && onSelectField(field)}>
+                          Inspect Incident
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            </React.Fragment>
+          );
+        })}
       </MapContainer>
     </div>
   );
 }
+
+const styles = {
+  mapWrapper: {
+    width: "100%",
+    borderRadius: "12px",
+    overflow: "hidden",
+    border: "1px solid #cbd5e1",
+    background: "#ffffff",
+    display: "flex",
+    flexDirection: "column",
+  },
+  mapHeader: {
+    padding: "0.6rem 1rem",
+    background: "#f8fafc",
+    borderBottom: "1px solid #e2e8f0",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "0.5rem",
+  },
+  legendGroup: {
+    display: "flex",
+    gap: "1rem",
+    fontSize: "0.8rem",
+    color: "#334155",
+  },
+  legendItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "5px",
+    fontWeight: "500"
+  },
+  dot: {
+    width: "9px",
+    height: "9px",
+    borderRadius: "50%",
+  },
+  tileToggle: {
+    display: "flex",
+    background: "#e2e8f0",
+    borderRadius: "6px",
+    padding: "2px",
+  },
+  tileBtn: {
+    padding: "4px 10px",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "0.78rem",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+  mapContainer: {
+    height: "440px",
+    width: "100%",
+  },
+  popupContent: {
+    fontSize: "0.85rem",
+    lineHeight: "1.4",
+  }
+};

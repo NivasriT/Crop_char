@@ -1,112 +1,183 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import RiskMap from "../components/RiskMap";
-import PriorityTable from "../components/PriorityTable";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Logo from "../components/Logo";
+import { IconLogout, IconUser, IconShield } from "../components/Icons";
 import FarmerView from "../components/FarmerView";
 import CompanyView from "../components/CompanyView";
 import OfficerView from "../components/OfficerView";
-import { api } from "../api/client";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { category } = useParams(); // farmer, buyer, officer
   const [role, setRole] = useState(localStorage.getItem("role") || "farmer");
-  const [fields, setFields] = useState([]);
-  const [fires, setFires] = useState([]);
-  const [stats, setStats] = useState({ fields_monitored: 0, high_risk: 0, prevented: 0, active_fires: 0 });
-  const [selectedField, setSelectedField] = useState(null);
+  const [username, setUsername] = useState(localStorage.getItem("username") || "Gurpreet Singh");
 
   useEffect(() => {
-    const fetchAllData = async () => {
-      try {
-        const [fieldsRes, firesRes, statsRes] = await Promise.all([
-          api.get("/fields"),
-          api.get("/fires"),
-          api.get("/stats"),
-        ]);
-        
-        setFields(fieldsRes.data);
-        setFires(firesRes.data);
-        setStats(statsRes.data);
+    const storedRole = localStorage.getItem("role");
+    const storedUsername = localStorage.getItem("username");
 
-        // Auto-select first high risk field for quick inspection
-        if (fieldsRes.data.length > 0) {
-          setSelectedField(fieldsRes.data[0]);
-        }
-      } catch (err) {
-        console.error("Error fetching live backend data:", err);
-      }
+    // 1. Check if user is logged in
+    if (!storedRole) {
+      navigate("/login");
+      return;
+    }
+
+    setRole(storedRole);
+    if (storedUsername) setUsername(storedUsername);
+
+    // 2. Map route category parameter to role code
+    const categoryToRole = {
+      farmer: "farmer",
+      buyer: "company",
+      officer: "officer"
     };
 
-    fetchAllData();
-    // Refresh live satellite data every 10 seconds
-    const interval = setInterval(fetchAllData, 10000);
-    return () => clearInterval(interval);
-  }, []);
+    const requestedRole = categoryToRole[category];
 
-  const handleRoleChange = (newRole) => {
-    setRole(newRole);
-    localStorage.setItem("role", newRole);
-  };
+    // 3. STRICT ROLE-BASED ACCESS CONTROL (RBAC)
+    // If user tries to access a URL category that does not match their logged-in role, redirect to allowed dashboard!
+    if (requestedRole && requestedRole !== storedRole) {
+      console.warn(`[RBAC Enforcement] Blocked unauthorized access attempt to /dashboard/${category}`);
+      const allowedCategory = storedRole === "farmer" ? "farmer" : storedRole === "company" ? "buyer" : "officer";
+      navigate(`/dashboard/${allowedCategory}`, { replace: true });
+    }
+  }, [category, navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("role");
-    navigate("/");
+  const handleSignOut = () => {
+    localStorage.clear();
+    navigate("/login");
   };
 
   return (
     <div style={styles.dashboardContainer}>
-      <Sidebar currentRole={role} onRoleChange={handleRoleChange} onLogout={handleLogout} />
+      {/* Clean Enterprise Top Navigation Header */}
+      <header style={styles.header}>
+        <div style={styles.brandBox} onClick={() => navigate("/")}>
+          <Logo size="md" />
+        </div>
 
+        {/* User Session Info & Sign Out */}
+        <div style={styles.userSection}>
+          <div style={styles.userInfo}>
+            <span style={styles.userName}>{username}</span>
+            <span style={{
+              ...styles.roleBadge,
+              background: role === "farmer" ? "#ecfdf5" : role === "company" ? "#eff6ff" : "#fef2f2",
+              color: role === "farmer" ? "#047857" : role === "company" ? "#1d4ed8" : "#b91c1c",
+              borderColor: role === "farmer" ? "#a7f3d0" : role === "company" ? "#bfdbfe" : "#fecaca",
+            }}>
+              {role === "farmer" && "FARMER CATEGORY"}
+              {role === "company" && "BIOMASS BUYER CATEGORY"}
+              {role === "officer" && "GOVERNMENT OFFICER CATEGORY"}
+            </span>
+          </div>
+
+          <button style={styles.signOutBtn} onClick={handleSignOut} title="Sign Out">
+            <IconLogout size={16} /> Sign Out
+          </button>
+        </div>
+      </header>
+
+      {/* Main Role-Isolated Content */}
       <main style={styles.mainContent}>
-        <header style={styles.header}>
-          <div>
-            <h2>🌾 CropChar Monitor Platform</h2>
-            <p style={{ color: "#aaa", margin: 0, fontSize: "0.85rem" }}>Live Satellite & ML Prevention Network</p>
-          </div>
-          <span style={styles.roleBadge}>Role: {role.toUpperCase()}</span>
-        </header>
-
-        {/* Live System Stats Banner */}
-        <div style={styles.statsBar}>
-          <div style={styles.statCard}>📊 Monitored Fields: <strong>{stats.fields_monitored}</strong></div>
-          <div style={styles.statCard}>⚠️ High Risk Fields: <strong style={{ color: "#f44336" }}>{stats.high_risk}</strong></div>
-          <div style={styles.statCard}>🔥 Active Satellite Fires: <strong style={{ color: "#ff9800" }}>{stats.active_fires}</strong></div>
-          <div style={styles.statCard}>🛡️ Burns Prevented: <strong style={{ color: "#4caf50" }}>{stats.prevented}</strong></div>
-        </div>
-
-        <div style={styles.grid}>
-          <div style={styles.mapSection}>
-            <h3>Field Risk Overview</h3>
-            <RiskMap fields={fields} fires={fires} onSelectField={setSelectedField} />
-          </div>
-
-          <div style={styles.detailSection}>
-            <h3>Role Action Panel</h3>
-            {role === "farmer" && <FarmerView selectedField={selectedField} />}
-            {role === "company" && <CompanyView selectedField={selectedField} />}
-            {role === "officer" && <OfficerView selectedField={selectedField} />}
-          </div>
-        </div>
-
-        <div style={styles.tableSection}>
-          <h3>High-Risk Priority Queue</h3>
-          <PriorityTable fields={fields} onSelectField={setSelectedField} />
-        </div>
+        {role === "farmer" && <FarmerView />}
+        {role === "company" && <CompanyView />}
+        {role === "officer" && <OfficerView />}
       </main>
+
+      {/* Footer */}
+      <footer style={styles.footer}>
+        <div style={styles.footerInner}>
+          <span>CropChar Platform • Agricultural Satellite Stubble Intelligence</span>
+          <span>Northern Agricultural Regions (Punjab • Haryana • Bihar • UP)</span>
+        </div>
+      </footer>
     </div>
   );
 }
 
 const styles = {
-  dashboardContainer: { display: "flex", minHeight: "100vh", backgroundColor: "#121212", color: "#fff", fontFamily: "Arial, sans-serif" },
-  mainContent: { flex: 1, padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.5rem" },
-  header: { display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #333", paddingBottom: "1rem" },
-  roleBadge: { backgroundColor: "#2e7d32", padding: "0.4rem 0.8rem", borderRadius: "20px", fontWeight: "bold", fontSize: "0.85rem" },
-  statsBar: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" },
-  statCard: { backgroundColor: "#1e1e1e", padding: "0.8rem 1rem", borderRadius: "6px", fontSize: "0.9rem", border: "1px solid #2a2a2a" },
-  grid: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem" },
-  mapSection: { backgroundColor: "#1e1e1e", padding: "1rem", borderRadius: "8px" },
-  detailSection: { backgroundColor: "#1e1e1e", padding: "1rem", borderRadius: "8px" },
-  tableSection: { backgroundColor: "#1e1e1e", padding: "1rem", borderRadius: "8px" },
+  dashboardContainer: {
+    minHeight: "100vh",
+    background: "#f8fafc",
+    color: "#0f172a",
+    display: "flex",
+    flexDirection: "column",
+  },
+  header: {
+    padding: "0.9rem 2rem",
+    background: "#ffffff",
+    borderBottom: "1px solid #e2e8f0",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "1rem",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.04)"
+  },
+  brandBox: {
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+  },
+  userSection: {
+    display: "flex",
+    alignItems: "center",
+    gap: "1.5rem",
+  },
+  userInfo: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: "2px",
+  },
+  userName: {
+    fontSize: "0.88rem",
+    fontWeight: "700",
+    color: "#0f172a",
+  },
+  roleBadge: {
+    padding: "2px 8px",
+    borderRadius: "12px",
+    fontSize: "0.7rem",
+    fontWeight: "800",
+    border: "1px solid",
+  },
+  signOutBtn: {
+    padding: "0.5rem 1rem",
+    background: "#ffffff",
+    border: "1px solid #cbd5e1",
+    color: "#334155",
+    borderRadius: "8px",
+    fontWeight: "600",
+    fontSize: "0.82rem",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "all 0.15s ease"
+  },
+  mainContent: {
+    flex: 1,
+    padding: "1.5rem 2rem",
+    maxWidth: "1440px",
+    width: "100%",
+    margin: "0 auto",
+  },
+  footer: {
+    padding: "1rem 2rem",
+    background: "#ffffff",
+    borderTop: "1px solid #e2e8f0",
+    fontSize: "0.8rem",
+    color: "#64748b",
+  },
+  footerInner: {
+    maxWidth: "1440px",
+    margin: "0 auto",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "1rem"
+  }
 };
