@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
 
 export default function RiskMap({ fields, fires, onSelectField }) {
   // Center around Coimbatore region (11.016, 76.955 from Navithanjali's output)
-  const defaultCenter = [11.0168, 76.9558];
+  const defaultCenter = [31.1471, 75.3412];
 
   const getFieldStyle = (field) => {
     const score = field.risk_score || 0;
