@@ -2,16 +2,17 @@ import os
 import joblib
 import pandas as pd
 from fastapi import APIRouter, FastAPI, HTTPException
+from fire_pipeline import fetch_active_fires, match_fires_to_fields
 
-# 1. Router for Navithanjali to import into backend/app/main.py
+# 1. Main router for backend integration
 router = APIRouter()
 
-# Absolute paths
+# Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "risk_model.pkl")
 DATA_PATH = os.path.join(BASE_DIR, "data", "synthetic_fields.csv")
 
-# Load model and dataset
+# Load ML model & features dataset
 model = joblib.load(MODEL_PATH)
 df_fields = pd.read_csv(DATA_PATH)
 
@@ -44,6 +45,7 @@ def get_top_reasons(row: dict) -> list[str]:
 
 @router.get("/fields/{field_id}/risk")
 def get_risk(field_id: str):
+    """Returns risk prediction and countdown for a given field."""
     if field_id not in FIELD_FEATURES:
         raise HTTPException(
             status_code=404,
@@ -56,7 +58,6 @@ def get_risk(field_id: str):
     predicted_val = model.predict(feature_df)[0]
     score = int(round(float(predicted_val)))
     clamped_score = max(0, min(100, score))
-    
     countdown = int(max(1, float(row["days_until_next_sowing"])) * 24)
 
     return {
@@ -65,6 +66,13 @@ def get_risk(field_id: str):
         "countdown_hours": countdown,
     }
 
-# 2. Standalone app for local testing
+@router.get("/fires")
+def get_fires():
+    """Fetches active satellite fires and returns those matching monitored field boundaries."""
+    fires_df = fetch_active_fires()
+    matched = match_fires_to_fields(fires_df)
+    return matched
+
+# Standalone app for local testing
 app = FastAPI()
 app.include_router(router)
