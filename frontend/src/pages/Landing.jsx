@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import { 
   IconSatellite, IconLeaf, IconFlame, IconFactory, IconShield, 
-  IconTruck, IconCheck, IconArrowRight, IconUser 
+  IconTruck, IconCheck, IconArrowRight, IconUser, IconPlay
 } from "../components/Icons";
 
 export default function Landing() {
@@ -73,6 +73,9 @@ export default function Landing() {
         <div style={styles.navInner}>
           <Logo size="md" />
           <div style={styles.navActions}>
+            <button style={styles.introNavBtn} onClick={() => navigate("/")}>
+              <IconPlay size={14} color="#059669" /> Watch Intro
+            </button>
             <button style={styles.loginNavBtn} onClick={() => navigate("/login")}>
               <IconUser size={16} /> Portal Login
             </button>
@@ -96,6 +99,9 @@ export default function Landing() {
         <div style={styles.heroBtnGroup}>
           <button style={styles.primaryBtn} onClick={() => navigate("/login")}>
             Access Portal Login <IconArrowRight size={18} />
+          </button>
+          <button style={styles.secondaryBtn} onClick={() => navigate("/")}>
+            <IconPlay size={16} color="#0f172a" /> Watch Intro Video
           </button>
         </div>
       </section>
@@ -245,7 +251,21 @@ const styles = {
   },
   navActions: {
     display: "flex",
-    gap: "1rem"
+    gap: "0.8rem",
+    alignItems: "center"
+  },
+  introNavBtn: {
+    background: "#f1f5f9",
+    color: "#0f172a",
+    border: "1px solid #cbd5e1",
+    padding: "0.6rem 1rem",
+    borderRadius: "8px",
+    fontWeight: "700",
+    fontSize: "0.88rem",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px"
   },
   loginNavBtn: {
     background: "#059669",
@@ -299,7 +319,8 @@ const styles = {
   heroBtnGroup: {
     display: "flex",
     justifyContent: "center",
-    gap: "1rem"
+    gap: "1rem",
+    flexWrap: "wrap"
   },
   primaryBtn: {
     background: "#059669",
@@ -314,6 +335,20 @@ const styles = {
     alignItems: "center",
     gap: "8px",
     boxShadow: "0 4px 14px rgba(5, 150, 105, 0.25)"
+  },
+  secondaryBtn: {
+    background: "#ffffff",
+    color: "#0f172a",
+    border: "1px solid #cbd5e1",
+    padding: "0.9rem 1.8rem",
+    borderRadius: "10px",
+    fontWeight: "700",
+    fontSize: "1rem",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)"
   },
   storySection: {
     maxWidth: "1100px",
