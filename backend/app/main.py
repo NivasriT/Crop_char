@@ -63,3 +63,24 @@ def health():
         "monitored_fields": len(fields.FIELDS_DB),
         "active_fires": len(fires.FIRES_DB)
     }
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+# Calculate the path to the frontend dist folder
+# This assumes main.py is inside backend/app/
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIST = os.path.abspath(os.path.join(BASE_DIR, "../../frontend/dist"))
+
+# Serve the static assets (CSS, JS, Images)
+app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="assets")
+
+# Catch-all route to serve the React app for all other URLs
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    # Don't intercept actual API calls (assuming your API routes start with /api, /auth, etc.)
+    # Add any other backend prefixes you use to this list
+    if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
+        return {"error": "API route not found"}
+        
+    return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
