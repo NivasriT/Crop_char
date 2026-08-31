@@ -1,5 +1,3 @@
-Here’s the **clean copy-paste version** — no extra explanation.
-
 ````markdown
 # 🌾 CropChar — Team Solvex
 
