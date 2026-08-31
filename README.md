@@ -1,4 +1,4 @@
-````markdown
+
 # 🌾 CropChar — Team Solvex
 
 > A single-dashboard crop-fire risk management system.
@@ -435,6 +435,5 @@ Built using:
 
 > 🌾 Turning crop-fire risk into actionable intelligence.
 
-```
-```
+
 
